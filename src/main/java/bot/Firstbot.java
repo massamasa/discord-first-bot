@@ -13,21 +13,31 @@ import java.util.ArrayList;
 
 public class Firstbot {
     public static void main(final String[] args) {
-        final int[] day = {LocalDateTime.now(ZoneId.of("Etc/GMT-3")).getDayOfYear()};
-        final String token = System.getenv("discordbottoken");
+        String timeZone = System.getenv("timezone");
+        String token = System.getenv("discordbottoken");
+        String postgresqladdress = System.getenv("postgresqladdress");
+        final int[] day = {LocalDateTime.now(ZoneId.of(timeZone)).getDayOfYear()};
         final DiscordClient client = DiscordClient.create(token);
         final GatewayDiscordClient gateway = client.login().block();
-        final String postgresqladdress = System.getenv("postgresqladdress");
-        PsqlDb db = new PsqlDb(postgresqladdress);
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
-            LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Etc/GMT-3"));
+            LocalDateTime currentTime = LocalDateTime.now(ZoneId.of(timeZone));
             int currentDay = currentTime.getDayOfYear();
-            if (currentDay != day[0]){
-            //if (message.getContent().equals("!eka")){
-                day[0] = currentDay;
+            if (message.getContent().equals("!testi")){
+                System.out.println(currentTime);
                 final MessageChannel channel = message.getChannel().block();
-
+                channel.createMessage("toimii").block();
+                PsqlDb db = new PsqlDb(postgresqladdress);
+                String messageOutput = "";
+                ArrayList<String> timesList = db.getTimesList();
+                for(String s: timesList){
+                    messageOutput+=s;
+                }
+                channel.createMessage(messageOutput).block();
+            } else if (currentDay != day[0]){
+                day[0] = currentDay;
+                PsqlDb db = new PsqlDb(postgresqladdress);
+                final MessageChannel channel = message.getChannel().block();
                 String user_id = event.getMember().get().getId().toString();
                 String username = event.getMember().get().getDisplayName();
                 String messageOutput = "**EKA** oli " + username + "!\n\n";
@@ -37,10 +47,7 @@ public class Firstbot {
                     db.addOneToScore(user_id);
                 }
                 db.addToTimes(user_id, username, Timestamp.valueOf(currentTime));
-
-
                 db.getStatisticsList();
-
                 messageOutput += "**Tilastot**\n";
                 ArrayList<String> statisticsList = db.getStatisticsList();
                 for(String s: statisticsList){

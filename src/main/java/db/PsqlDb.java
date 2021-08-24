@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class PsqlDb {
     private Connection conn;
+
     public PsqlDb(String postgresqladdress) {
         try {
             conn = DriverManager.getConnection(postgresqladdress);
@@ -13,6 +14,7 @@ public class PsqlDb {
             e.printStackTrace();
         }
     }
+
     public boolean userExists(String user_id) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("SELECT user_id FROM statistics WHERE user_id = ?");
