@@ -1,6 +1,5 @@
 package db;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -40,9 +39,8 @@ public class PsqlDb {
     }
 
     public void addOneToScore(String user_id) {
-        PreparedStatement preparedStatement = null;
         try {
-            preparedStatement = conn.prepareStatement("UPDATE statistics SET  score = (score + 1) WHERE user_id = ?");
+            PreparedStatement preparedStatement = conn.prepareStatement("UPDATE statistics SET  score = (score + 1) WHERE user_id = ?");
             preparedStatement.setString(1, user_id);
             preparedStatement.execute();
         } catch (SQLException e) {
