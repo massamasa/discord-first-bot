@@ -24,7 +24,7 @@ dependencies {
 }
 
 application {
-    mainClassName= 'botti.ekabotti'
+    mainClassName= 'bot.Firstbot'
 }
 
 jar {

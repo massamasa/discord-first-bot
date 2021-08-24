@@ -13,9 +13,9 @@ import java.util.ArrayList;
 
 public class Firstbot {
     public static void main(final String[] args) {
-        String timeZone = System.getenv("timezone");
-        String token = System.getenv("discordbottoken");
-        String postgresqladdress = System.getenv("postgresqladdress");
+        final String timeZone = System.getenv("timezone");
+        final String token = System.getenv("discordbottoken");
+        final String postgresqladdress = System.getenv("postgresqladdress");
         final int[] day = {LocalDateTime.now(ZoneId.of(timeZone)).getDayOfYear()};
         final DiscordClient client = DiscordClient.create(token);
         final GatewayDiscordClient gateway = client.login().block();
