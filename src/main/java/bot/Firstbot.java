@@ -6,10 +6,10 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
-import java.sql.*;
+import domain.MessageString;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 
 public class Firstbot {
     public static void main(final String[] args) {
@@ -23,42 +23,20 @@ public class Firstbot {
             final Message message = event.getMessage();
             LocalDateTime currentTime = LocalDateTime.now(ZoneId.of(timeZone));
             int currentDay = currentTime.getDayOfYear();
-            if (message.getContent().equals("!testi")){
+            /*if (message.getContent().equals("!testi")){
                 System.out.println(currentTime);
                 final MessageChannel channel = message.getChannel().block();
-                channel.createMessage("toimii").block();
                 PsqlDb db = new PsqlDb(postgresqladdress);
-                String messageOutput = "";
-                ArrayList<String> timesList = db.getTimesList();
-                for(String s: timesList){
-                    messageOutput+=s;
-                }
-                channel.createMessage(messageOutput).block();
-            } else if (currentDay != day[0]){
+                channel.createMessage(new messageString().firstOutput(db, "testi","testi", currentTime)).block();
+            } else */
+            if (currentDay != day[0]){
                 day[0] = currentDay;
                 PsqlDb db = new PsqlDb(postgresqladdress);
                 final MessageChannel channel = message.getChannel().block();
                 String user_id = event.getMember().get().getId().toString();
                 String username = event.getMember().get().getDisplayName();
-                String messageOutput = "**EKA** oli " + username + "!\n\n";
-                if (!db.userExists(user_id)) {
-                    db.addUser(user_id, event.getMember().get().getDisplayName());
-                } else {
-                    db.addOneToScore(user_id);
-                }
-                db.addToTimes(user_id, username, Timestamp.valueOf(currentTime));
-                db.getStatisticsList();
-                messageOutput += "**Tilastot**\n";
-                ArrayList<String> statisticsList = db.getStatisticsList();
-                for(String s: statisticsList){
-                    messageOutput+=s;
-                }
-                messageOutput+= "**Viimeisen viikon ekat:** \n";
-                ArrayList<String> timesList = db.getTimesList();
-                for(String s: timesList){
-                    messageOutput+=s;
-                }
-                channel.createMessage(messageOutput).block();
+                db.addFirst(user_id, username, currentTime);
+                channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
                 System.exit(0);
             }
         });

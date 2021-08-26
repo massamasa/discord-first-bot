@@ -1,6 +1,7 @@
 package db;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class PsqlDb {
@@ -14,7 +15,7 @@ public class PsqlDb {
         }
     }
 
-    public boolean userExists(String user_id) {
+    private boolean userExists(String user_id) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("SELECT user_id FROM statistics WHERE user_id = ?");
             preparedStatement.setString(1, user_id);
@@ -26,7 +27,7 @@ public class PsqlDb {
         return false;
     }
 
-    public void addUser(String user_id, String username) {
+    private void addUser(String user_id, String username) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO statistics (user_id, username, score) VALUES (?, ?, ?)");
             preparedStatement.setString(1, user_id);
@@ -38,7 +39,7 @@ public class PsqlDb {
         }
     }
 
-    public void addOneToScore(String user_id) {
+    private void addOneToScore(String user_id) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("UPDATE statistics SET  score = (score + 1) WHERE user_id = ?");
             preparedStatement.setString(1, user_id);
@@ -48,7 +49,7 @@ public class PsqlDb {
         }
     }
 
-    public void addToTimes(String user_id, String username, Timestamp timestamp) {
+    private void addToTimes(String user_id, String username, Timestamp timestamp) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO times (user_id, username, time) VALUES (?, ?, ?)");
             preparedStatement.setString(1,user_id);
@@ -63,7 +64,7 @@ public class PsqlDb {
     public ArrayList<String> getStatisticsList() {
         ArrayList<String> list = new ArrayList<>();
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM statistics");
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM statistics ORDER BY score DESC");
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
                 list.add(resultSet.getString(2) +":  "+ resultSet.getInt(3)+ "\n");
@@ -88,5 +89,14 @@ public class PsqlDb {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public void addFirst(String user_id, String username, LocalDateTime currentTime) {
+        if (!userExists(user_id)) {
+            addUser(user_id, username);
+        } else {
+            addOneToScore(user_id);
+        }
+        addToTimes(user_id, username, Timestamp.valueOf(currentTime));
     }
 }
