@@ -21,14 +21,14 @@ public class Firstbot {
         final GatewayDiscordClient gateway = client.login().block();
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
-            LocalDateTime currentTime = LocalDateTime.now(ZoneId.of(timeZone));
+            LocalDateTime currentTime = event.getMessage().getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime();
             int currentDay = currentTime.getDayOfYear();
             /*if (message.getContent().equals("!testi")){
                 System.out.println(currentTime);
                 final MessageChannel channel = message.getChannel().block();
                 PsqlDb db = new PsqlDb(postgresqladdress);
-                channel.createMessage(new messageString().firstOutput(db, "testi","testi", currentTime)).block();
-            } else */
+                channel.createMessage(new MessageString().firstOutput(db, "testi","testi", currentTime)).block();
+            } else*/
             if (currentDay != day[0]){
                 day[0] = currentDay;
                 PsqlDb db = new PsqlDb(postgresqladdress);
