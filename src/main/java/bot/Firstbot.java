@@ -39,7 +39,7 @@ public class Firstbot {
                     .findFirst().get();
             String user_id = message1.getAuthor().get().getId().toString();
             String username = message1.getAuthor().get().getUsername().toString();
-            db.addFirst(user_id, username, currentTime);
+            db.addFirst(user_id, username, message1.getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime());
             channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
             System.exit(0);
         });
