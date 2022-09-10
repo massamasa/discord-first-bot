@@ -1,6 +1,7 @@
 package bot;
 
 import db.PsqlDb;
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -8,6 +9,8 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import domain.MessageString;
 
+import java.security.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -23,22 +26,24 @@ public class Firstbot {
             final Message message = event.getMessage();
             LocalDateTime currentTime = event.getMessage().getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime();
             int currentDay = currentTime.getDayOfYear();
-            /*if (message.getContent().equals("!testi")){
-                System.out.println(currentTime);
-                final MessageChannel channel = message.getChannel().block();
-                PsqlDb db = new PsqlDb(postgresqladdress);
-                channel.createMessage(new MessageString().firstOutput(db, "testi","testi", currentTime)).block();
-            } else*/
-            if (currentDay != day[0]){
-                day[0] = currentDay;
-                PsqlDb db = new PsqlDb(postgresqladdress);
-                final MessageChannel channel = message.getChannel().block();
-                String user_id = event.getMember().get().getId().toString();
-                String username = event.getMember().get().getDisplayName();
-                db.addFirst(user_id, username, currentTime);
-                channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
-                System.exit(0);
-            }
+            day[0] = currentDay;
+            PsqlDb db = new PsqlDb(postgresqladdress);
+            final MessageChannel channel = message.getChannel().block();
+            Message message1 = channel.
+                    getMessagesAfter(Snowflake.of(event.getMessage().
+                            getTimestamp().minusSeconds(180000))).
+                    toStream().
+                    filter(message2 -> message2.getTimestamp().atZone(ZoneId.of(timeZone)).
+                            getDayOfYear() ==Math.abs(currentDay-1)).
+                    sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
+                    .findFirst().get();
+            System.out.println(message1.getTimestamp());
+            String user_id = event.getMember().get().getId().toString();
+            String username = event.getMember().get().getDisplayName();
+            //db.addFirst(user_id, username, currentTime);
+            channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
+            channel.createMessage("TESTI. PISTEET EI MUUTTUNUT").block();
+            System.exit(0);
         });
 
         gateway.onDisconnect().block();
