@@ -34,7 +34,7 @@ public class Firstbot {
                             getTimestamp().minusSeconds(84600))).
                     toStream().
                     filter(message2 -> message2.getTimestamp().atZone(ZoneId.of(timeZone)).
-                            getDayOfYear() !=currentDay).
+                            getDayOfYear() ==currentDay).
                     sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
                     .findFirst().get();
             String user_id = message1.getAuthor().get().getId().toString();
