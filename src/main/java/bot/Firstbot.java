@@ -31,10 +31,10 @@ public class Firstbot {
             final MessageChannel channel = message.getChannel().block();
             Message message1 = channel.
                     getMessagesAfter(Snowflake.of(event.getMessage().
-                            getTimestamp().minusSeconds(180000))).
+                            getTimestamp().minusSeconds(84600))).
                     toStream().
                     filter(message2 -> message2.getTimestamp().atZone(ZoneId.of(timeZone)).
-                            getDayOfYear() ==Math.abs(currentDay-1)).
+                            getDayOfYear() !=currentDay).
                     sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
                     .findFirst().get();
             String user_id = message1.getAuthor().get().getId().toString();
