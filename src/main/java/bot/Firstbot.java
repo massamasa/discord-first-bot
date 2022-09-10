@@ -37,12 +37,10 @@ public class Firstbot {
                             getDayOfYear() ==Math.abs(currentDay-1)).
                     sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
                     .findFirst().get();
-            System.out.println(message1.getTimestamp());
-            String user_id = event.getMember().get().getId().toString();
-            String username = event.getMember().get().getDisplayName();
-            //db.addFirst(user_id, username, currentTime);
+            String user_id = message1.getAuthor().get().getId().toString();
+            String username = message1.getAuthor().get().getUsername().toString();
+           // db.addFirst(user_id, username, currentTime);
             channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
-            channel.createMessage("TESTI. PISTEET EI MUUTTUNUT").block();
             System.exit(0);
         });
 
