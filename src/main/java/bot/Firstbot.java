@@ -42,7 +42,7 @@ public class Firstbot {
                         sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
                         .findFirst().get();
             } catch (Exception e) {
-                message1 = null
+                message1 = null;
             }
             if (message1 != null) {
                 String user_id = message1.getAuthor().get().getId().toString();
