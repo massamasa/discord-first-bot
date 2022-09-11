@@ -51,8 +51,6 @@ public class Firstbot {
                 channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
                 System.exit(0);
                 gateway.onDisconnect().block();
-            }else {
-                continue;
             }
         }
     }
