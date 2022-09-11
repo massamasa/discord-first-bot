@@ -26,25 +26,33 @@ public class Firstbot {
         final int[] day = {LocalDateTime.now(ZoneId.of(timeZone)).getDayOfYear()};
         final DiscordClient client = DiscordClient.create(token);
         final GatewayDiscordClient gateway = client.login().block();
-            LocalDateTime currentTime = now().atZone(ZoneId.of(timeZone)).toLocalDateTime();
-            int currentDay = currentTime.getDayOfYear();
-            day[0] = currentDay;
-            PsqlDb db = new PsqlDb(postgresqladdress);
-            final MessageChannel channel  = (MessageChannel) gateway.getChannelById(Snowflake.of(channelid)).block();
-            Message message1 = channel.
-                    getMessagesAfter(Snowflake.of(now().minusSeconds(84600))).
-                    toStream().
-                    filter(message2 -> message2.getTimestamp().atZone(ZoneId.of(timeZone)).
-                            getDayOfYear() ==currentDay).
-                    sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
-                    .findFirst().get();
-            String user_id = message1.getAuthor().get().getId().toString();
-            String username = message1.getAuthor().get().getUsername().toString();
-           // db.addFirst(user_id, username, message1.getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime());
-            channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
-            channel.createMessage("TESTI").block();
-            System.exit(0);
-
-        gateway.onDisconnect().block();
+        LocalDateTime currentTime = now().atZone(ZoneId.of(timeZone)).toLocalDateTime();
+        int currentDay = currentTime.getDayOfYear();
+        day[0] = currentDay;
+        PsqlDb db = new PsqlDb(postgresqladdress);
+        final MessageChannel channel  = (MessageChannel) gateway.getChannelById(Snowflake.of(channelid)).block();
+        Message message1 = null;
+        while(true) {
+            try {
+                message1 = channel.
+                        getMessagesAfter(Snowflake.of(now().minusSeconds(84600))).
+                        toStream().
+                        filter(message2 -> message2.getTimestamp().atZone(ZoneId.of(timeZone)).
+                                getDayOfYear() == currentDay).
+                        sorted((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()))
+                        .findFirst().get();
+            } catch (Exception e) {
+                message1 = null
+            }
+            if (message1 != null) {
+                String user_id = message1.getAuthor().get().getId().toString();
+                String username = message1.getAuthor().get().getUsername().toString();
+                // db.addFirst(user_id, username, message1.getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime());
+                channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
+                channel.createMessage("TESTI").block();
+                gateway.onDisconnect().block();
+                System.exit(0);
+            }
+        }
     }
 }
