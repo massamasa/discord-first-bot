@@ -35,7 +35,7 @@ public class Firstbot {
         while(true) {
             try {
                 message1 = channel.
-                        getMessagesAfter(Snowflake.of(now().minusSeconds(84600))).
+                        getMessagesAfter(Snowflake.of(now().minusSeconds(0))).
                         toStream().
                         filter(message2 -> message2.getTimestamp().atZone(ZoneId.of(timeZone)).
                                 getDayOfYear() == currentDay).
@@ -47,7 +47,7 @@ public class Firstbot {
             if (message1 != null) {
                 String user_id = message1.getAuthor().get().getId().toString();
                 String username = message1.getAuthor().get().getUsername().toString();
-                db.addFirst(user_id, username, message1.getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime());
+                //db.addFirst(user_id, username, message1.getTimestamp().atZone(ZoneId.of(timeZone)).toLocalDateTime());
                 channel.createMessage(new MessageString().firstOutput(db, username, user_id, currentTime)).block();
                 channel.createMessage("TESTI").block();
                 System.exit(0);
